@@ -1,0 +1,121 @@
+diff -up openssh/ssh_config.redhat openssh/ssh_config
+--- openssh/ssh_config.redhat	2020-02-11 23:28:35.000000000 +0100
++++ openssh/ssh_config	2020-02-13 18:13:39.180641839 +0100
+@@ -43,3 +43,10 @@
+ #   VisualHostKey no
+ #   ProxyCommand ssh -q -W %h:%p gateway.example.com
+ #   RekeyLimit 1G 1h
++#
++# This system is following system-wide crypto policy.
++# To modify the crypto properties (Ciphers, MACs, ...), create a  *.conf
++#  file under  /etc/ssh/ssh_config.d/  which will be automatically
++# included below. For more information, see manual page for
++#  update-crypto-policies(8)  and  ssh_config(5).
++Include /etc/ssh/ssh_config.d/*.conf
+diff -up openssh/ssh_config_redhat.redhat openssh/ssh_config_redhat
+--- openssh/ssh_config_redhat.redhat	2020-02-13 18:13:39.180641839 +0100
++++ openssh/ssh_config_redhat	2020-02-13 18:13:39.180641839 +0100
+@@ -0,0 +1,21 @@
++# The options here are in the "Match final block" to be applied as the last
++# options and could be potentially overwritten by the user configuration
++Match final all
++	# Follow system-wide Crypto Policy, if defined:
++	Include /etc/crypto-policies/back-ends/openssh.config
++
++	GSSAPIAuthentication yes
++
++# If this option is set to yes then remote X11 clients will have full access
++# to the original X11 display. As virtually no X11 client supports the untrusted
++# mode correctly we set this to yes.
++	ForwardX11Trusted yes
++
++# Send locale-related environment variables
++	SendEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
++	SendEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
++	SendEnv LC_IDENTIFICATION LC_ALL LANGUAGE
++	SendEnv XMODIFIERS
++
++# Uncomment this if you want to use .local domain
++# Host *.local
+diff -up openssh/sshd_config.0.redhat openssh/sshd_config.0
+--- openssh/sshd_config.0.redhat	2020-02-12 14:30:04.000000000 +0100
++++ openssh/sshd_config.0	2020-02-13 18:13:39.181641855 +0100
+@@ -970,9 +970,9 @@ DESCRIPTION
+ 
+      SyslogFacility
+              Gives the facility code that is used when logging messages from
+-             sshd(8).  The possible values are: DAEMON, USER, AUTH, LOCAL0,
+-             LOCAL1, LOCAL2, LOCAL3, LOCAL4, LOCAL5, LOCAL6, LOCAL7.  The
+-             default is AUTH.
++             sshd(8).  The possible values are: DAEMON, USER, AUTH, AUTHPRIV,
++             LOCAL0, LOCAL1, LOCAL2, LOCAL3, LOCAL4, LOCAL5, LOCAL6, LOCAL7.
++             The default is AUTH.
+ 
+      TCPKeepAlive
+              Specifies whether the system should send TCP keepalive messages
+diff -up openssh/sshd_config.5.redhat openssh/sshd_config.5
+--- openssh/sshd_config.5.redhat	2020-02-11 23:28:35.000000000 +0100
++++ openssh/sshd_config.5	2020-02-13 18:13:39.181641855 +0100
+@@ -1614,7 +1614,7 @@ By default no subsystems are defined.
+ .It Cm SyslogFacility
+ Gives the facility code that is used when logging messages from
+ .Xr sshd 8 .
+-The possible values are: DAEMON, USER, AUTH, LOCAL0, LOCAL1, LOCAL2,
++The possible values are: DAEMON, USER, AUTH, AUTHPRIV, LOCAL0, LOCAL1, LOCAL2,
+ LOCAL3, LOCAL4, LOCAL5, LOCAL6, LOCAL7.
+ The default is AUTH.
+ .It Cm TCPKeepAlive
+diff -up openssh/sshd_config.redhat openssh/sshd_config
+--- openssh/sshd_config.redhat	2020-02-11 23:28:35.000000000 +0100
++++ openssh/sshd_config	2020-02-13 18:20:16.349913681 +0100
+@@ -10,6 +10,10 @@
+ # possible, but leave them commented.  Uncommented options override the
+ # default value.
+ 
++# If you want to change the port on a SELinux system, you have to tell
++# SELinux about this change.
++# semanage port -a -t ssh_port_t -p tcp #PORTNUMBER
++#
+ #Port 22
+ #AddressFamily any
+ #ListenAddress 0.0.0.0
+@@ -114,3 +118,7 @@ Subsystem	sftp	/usr/libexec/sftp-server
+ #	AllowTcpForwarding no
+ #	PermitTTY no
+ #	ForceCommand cvs server
++
++# To modify the system-wide sshd configuration, create a  *.conf  file under
++#  /etc/ssh/sshd_config.d/  which will be automatically included below
++Include /etc/ssh/sshd_config.d/*.conf
+diff -up openssh/sshd_config_redhat.redhat openssh/sshd_config_redhat
+--- openssh/sshd_config_redhat.redhat	2020-02-13 18:14:02.268006439 +0100
++++ openssh/sshd_config_redhat	2020-02-13 18:19:20.765035947 +0100
+@@ -0,0 +1,28 @@
++# This system is following system-wide crypto policy. The changes to
++# crypto properties (Ciphers, MACs, ...) will not have any effect here.
++# They will be overridden by command-line options passed to the server
++# on command line.
++# Please, check manual pages for update-crypto-policies(8) and sshd_config(5).
++
++SyslogFacility AUTHPRIV
++
++PasswordAuthentication yes
++ChallengeResponseAuthentication no
++
++GSSAPIAuthentication yes
++GSSAPICleanupCredentials no
++
++UsePAM yes
++
++X11Forwarding yes
++
++# It is recommended to use pam_motd in /etc/pam.d/sshd instead of PrintMotd,
++# as it is more configurable and versatile than the built-in version.
++PrintMotd no
++
++# Accept locale-related environment variables
++AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
++AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
++AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
++AcceptEnv XMODIFIERS
++

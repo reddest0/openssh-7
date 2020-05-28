@@ -1,0 +1,31 @@
+---
+# Tests for docker container
+- hosts: localhost
+  tags:
+    - container
+  # no compatible tests
+
+# Tests for classic environment and Atomic Host
+- hosts: localhost
+  tags:
+    - all
+    - classic
+    - atomic
+  roles:
+  - role: standard-test-beakerlib
+    tests:
+    - port-forwarding
+    - pam_ssh_agent_auth
+    required_packages:
+    - iproute           # needs ip command
+    - procps-ng         # needs ps and pgrep commands
+    - initscripts       # needs service command
+    - openssh-clients   # needs ssh command
+    - findutils         # needs find command
+    - net-tools         # needs netstat command
+    - libselinux-utils  # needs selinuxenabled command
+    - nmap-ncat         # needs nc command
+    - pam_ssh_agent_auth
+    - gcc               # needs to test pam_ssh_agent_auth
+    - pam-devel         # needs to test pam_ssh_agent_auth
+    - expect            # needs to test pam_ssh_agent_auth

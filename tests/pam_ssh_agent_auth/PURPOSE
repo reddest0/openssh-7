@@ -1,0 +1,7 @@
+PURPOSE of /CoreOS/openssh/Sanity/pam_ssh_agent_auth
+Description: This is basic sanity test for pam_ssh_agent_auth
+Author: Jakub Jelen <jjelen@redhat.com>
+
+Created as a response to rhbz#1251777 and previous one rhbz#1225106.
+The code of pam module is outdated and compiled with current openssh
+version which went through quite enough refactoring.

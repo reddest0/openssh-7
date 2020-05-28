@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/openssh/Sanity/port-forwarding
+Description: Testing port forwarding (ideally all possibilities: -L, -R, -D)
+Author: Stanislav Zidek <szidek@redhat.com>
