@@ -242,8 +242,8 @@ BuildRequires: perl-podlators
 BuildRequires: systemd-devel
 BuildRequires: gcc
 BuildRequires: p11-kit-devel
-BuildRequires: libfido2-devel
-Recommends: p11-kit
+#BuildRequires: libfido2-devel
+#Recommends: p11-kit
 
 %if %{kerberos5}
 BuildRequires: krb5-devel
@@ -267,14 +267,14 @@ BuildRequires: gnupg2
 %package clients
 Summary: An open source SSH client applications
 Requires: openssh = %{version}-%{release}
-Requires: crypto-policies >= 20180306-1
+#Requires: crypto-policies >= 20180306-1
 
 %package server
 Summary: An open source SSH server daemon
 Requires: openssh = %{version}-%{release}
 Requires(pre): /usr/sbin/useradd
 Requires: pam >= 1.0.1-3
-Requires: crypto-policies >= 20180306-1
+#Requires: crypto-policies >= 20180306-1
 %{?systemd_requires}
 
 %if %{ldap}
@@ -412,9 +412,9 @@ popd
 %patch951 -p1 -b .pkcs11-uri
 %patch953 -p1 -b .scp-ipv6
 %patch958 -p1 -b .ssh-copy-id
-%patch962 -p1 -b .crypto-policies
+#%patch962 -p1 -b .crypto-policies
 %patch963 -p1 -b .openssl-evp
-%patch964 -p1 -b .openssl-kdf
+#%patch964 -p1 -b .openssl-kdf
 %patch965 -p1 -b .visibility
 %patch966 -p1 -b .x11-ipv6
 %patch967 -p1 -b .include
@@ -481,7 +481,7 @@ fi
 	--without-hardening `# The hardening flags are configured by system` \
 	--with-systemd \
 	--with-default-pkcs11-provider=yes \
-	--with-security-key-builtin=yes \
+	--with-security-key-builtin=no \
 %if %{ldap}
 	--with-ldap \
 %endif
